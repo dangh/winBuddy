@@ -67,9 +67,9 @@ static void *isActive = &isActive;
             NSLog(@"Loading winBuddy...");
             
             [Defaults registerDefaults:@{ PrefKey(@"HideMenubar"): @NO }];
-            [Defaults registerDefaults:@{ PrefKey(@"HideShadow"): @YES }];
+            [Defaults registerDefaults:@{ PrefKey(@"HideShadow"): @NO }];
             [Defaults registerDefaults:@{ PrefKey(@"HideTitleBar"): @NO }];
-            [Defaults registerDefaults:@{ PrefKey(@"ShowBorder"): @YES }];
+            [Defaults registerDefaults:@{ PrefKey(@"ShowBorder"): @NO }];
 
             [plugin setMenu];
             [plugin _updateMenubarState];
