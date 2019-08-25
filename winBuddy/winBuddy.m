@@ -14,6 +14,7 @@
 
 #define APP_BLACKLIST @[@"com.apple.loginwindow", @"com.apple.notificationcenterui", @"com.apple.OSDUIHelper", @"com.apple.controlstrip"]
 #define CLS_BLACKLIST @[@"TDesktopWindow", @"NSStatusBarWindow", @"NSCarbonMenuWindow", @"BookmarkBarFolderWindow", @"TShrinkToFitWindow", @"QLFullscreenWindow", @"QLPreviewPanel", @"NCRemoteViewServiceWindow"]
+#define APP_WHITELIST @[@"com.github.atom"]
 
 #define PrefKey(key)  (@"winBuddy_" key)
 #define ReadPref(key) [Defaults objectForKey:PrefKey(key)]
@@ -63,7 +64,7 @@ static void *isActive = &isActive;
 //    NSLog(@"wb_ Process Name: '%@' Process ID:'%d'", processName, processID);
     
     if (osx_ver >= 9) {
-        if (![APP_BLACKLIST containsObject:[[NSBundle mainBundle] bundleIdentifier]]) {
+        if ([APP_WHITELIST containsObject:[[NSBundle mainBundle] bundleIdentifier]]) {
             NSLog(@"Loading winBuddy...");
             
             [Defaults registerDefaults:@{ PrefKey(@"HideMenubar"): @NO }];
