@@ -35,7 +35,7 @@ static const char * const stylesKey = "wwb_styles";
 - (void)wwb_setupBorder;
 - (void)wwb_initBorder;
 - (void)wwb_updateBorder;
-- (void)wwb_updateTitleBar;
+- (void)wwb_updateTitleBar:(bool)show;
 - (void)wwb_updateToolBar;
 @end
 
@@ -101,14 +101,18 @@ static void *isActive = &isActive;
 //    NSLog(@"wb_ %@", [theWindow className]);
     if (![CLS_BLACKLIST containsObject:[theWindow className]]) {
         if (![objc_getAssociatedObject(theWindow, isActive) boolValue]) {
+            if ([APP_WHITELIST containsObject:[[NSBundle mainBundle] bundleIdentifier]]) {
+                theWindow.hasShadow = false;
+                [theWindow wwb_updateTitleBar:false];
+            }
             // Don't load in preference panes
-            if ([[[NSProcessInfo processInfo] processName] rangeOfString:@"com.apple.preference"].location == NSNotFound) {
+            else if ([[[NSProcessInfo processInfo] processName] rangeOfString:@"com.apple.preference"].location == NSNotFound) {
                 if (ReadPref(@"HideShadow") != nil)
                     theWindow.hasShadow = ![ReadPref(@"HideShadow") boolValue];
                 [plugin _updateMenubarState];
                 [theWindow wwb_setupBorder];
                 [theWindow wwb_updateToolBar];
-                [theWindow wwb_updateTitleBar];
+                [theWindow wwb_updateTitleBar:![ReadPref(@"HideTitleBar") boolValue]];
                 objc_setAssociatedObject(theWindow, isActive, [NSNumber numberWithBool:true], OBJC_ASSOCIATION_RETAIN);
             }
         }
@@ -133,8 +137,9 @@ static void *isActive = &isActive;
 }
 
 - (void)_updateTitleBarState {
+    bool showTitleBar = ![ReadPref(@"HideTitleBar") boolValue];
     for(NSWindow *window in [NSApp windows])
-        [window wwb_updateTitleBar];
+        [window wwb_updateTitleBar:showTitleBar];
 }
 
 - (void)_updateToolBarState {
@@ -302,7 +307,7 @@ static void *isActive = &isActive;
     }
 }
 
-- (void)wwb_updateTitleBar {
+- (void)wwb_updateTitleBar:(bool)showTitleBar {
     NSWindow *savedStyle = objc_getAssociatedObject(self, stylesKey);
     if (savedStyle == nil) {
         savedStyle = [[NSWindow alloc] init];
@@ -313,7 +318,7 @@ static void *isActive = &isActive;
     } else {
         [savedStyle setIsZoomed:false];
     }
-    if ([ReadPref(@"HideTitleBar") boolValue]) {
+    if (!showTitleBar) {
         self.titlebarAppearsTransparent = true;
         self.titleVisibility = true;
         NSWindow *styles = [[NSWindow alloc] init];
